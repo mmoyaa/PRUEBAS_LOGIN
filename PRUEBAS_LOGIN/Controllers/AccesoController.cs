@@ -1,8 +1,13 @@
-﻿using PRUEBAS_LOGIN.Models;
-using System;
-using System.Web.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
+using System.Web.Mvc;
+
+using PRUEBAS_LOGIN.Models;
+
 using System.Data.SqlClient;
 using System.Data;
 
@@ -11,8 +16,11 @@ namespace PRUEBAS_LOGIN.Controllers
     public class AccesoController : Controller
     {
 
-        static string cadena = "Data Source=masbien;Initial Catalog=DB_Acceso;Integrated Security=true";
-        // GET: Acceso 
+        static string cadena = @"Data Source=masbien;Initial Catalog=DB_Acceso;Integrated Security=true";
+
+
+
+        // GET: Acceso
         public ActionResult Login()
         {
             return View();
@@ -23,6 +31,8 @@ namespace PRUEBAS_LOGIN.Controllers
         {
             return View();
         }
+
+
         [HttpPost]
         public ActionResult Registrar(Usuario oUsuario)
         {
@@ -37,7 +47,7 @@ namespace PRUEBAS_LOGIN.Controllers
             else
             {
                 ViewData["Mensaje"] = "Las contraseñas no coinciden";
-                return View();  
+                return View();
             }
 
             using (SqlConnection cn = new SqlConnection(cadena))
@@ -75,7 +85,7 @@ namespace PRUEBAS_LOGIN.Controllers
 
         [HttpPost]
         public ActionResult Login(Usuario oUsuario)
-         {
+        {
             oUsuario.Clave = ConvertirSha256(oUsuario.Clave);
 
             using (SqlConnection cn = new SqlConnection(cadena))
@@ -89,8 +99,9 @@ namespace PRUEBAS_LOGIN.Controllers
                 cn.Open();
 
                 oUsuario.idUsuario = Convert.ToInt32(cmd.ExecuteScalar().ToString());
-                
+
             }
+
             if (oUsuario.idUsuario != 0)
             {
 
