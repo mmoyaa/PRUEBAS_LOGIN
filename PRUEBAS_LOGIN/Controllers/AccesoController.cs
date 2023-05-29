@@ -91,7 +91,6 @@ namespace PRUEBAS_LOGIN.Controllers
                 oUsuario.idUsuario = Convert.ToInt32(cmd.ExecuteScalar().ToString());
                 
             }
-
             if (oUsuario.idUsuario != 0)
             {
 
