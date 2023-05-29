@@ -1,14 +1,10 @@
 ﻿using PRUEBAS_LOGIN.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Security.Cryptography;
 using System.Text;
 using System.Data.SqlClient;
 using System.Data;
-using System.Web.Services.Description;
 
 namespace PRUEBAS_LOGIN.Controllers
 {
@@ -23,7 +19,6 @@ namespace PRUEBAS_LOGIN.Controllers
         }
 
 
-
         public ActionResult Registrar()
         {
             return View();
@@ -31,48 +26,52 @@ namespace PRUEBAS_LOGIN.Controllers
         [HttpPost]
         public ActionResult Registrar(Usuario oUsuario)
         {
-            bool Registrado;
-            string Mensaje;
-            if(oUsuario.Clave == oUsuario.ConfirmarClave) {
+            bool registrado;
+            string mensaje;
+
+            if (oUsuario.Clave == oUsuario.ConfirmarClave)
+            {
+
                 oUsuario.Clave = ConvertirSha256(oUsuario.Clave);
             }
             else
             {
-
-                ViewData["Mensaje"] = "las contraseñas no coinciden";
+                ViewData["Mensaje"] = "Las contraseñas no coinciden";
                 return View();  
             }
 
             using (SqlConnection cn = new SqlConnection(cadena))
             {
-                SqlCommand cmd = new SqlCommand("sp_RegistrarUsuario",cn);
+
+                SqlCommand cmd = new SqlCommand("sp_RegistrarUsuario", cn);
                 cmd.Parameters.AddWithValue("Correo", oUsuario.Correo);
                 cmd.Parameters.AddWithValue("Clave", oUsuario.Clave);
-                cmd.Parameters.Add("Registrado",SqlDbType.Bit).Direction=ParameterDirection.Output;
-                cmd.Parameters.Add("Mensaje", SqlDbType.VarChar,100).Direction = ParameterDirection.Output;
+                cmd.Parameters.Add("Registrado", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 100).Direction = ParameterDirection.Output;
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cn.Open();
+
                 cmd.ExecuteNonQuery();
-                Registrado = Convert.ToBoolean(cmd.Parameters["Registrado"].Value);
-                Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
-;            }
+
+                registrado = Convert.ToBoolean(cmd.Parameters["Registrado"].Value);
+                mensaje = cmd.Parameters["Mensaje"].Value.ToString();
 
 
-            ViewData["Mensaje"] = Mensaje;
-            if (Registrado)
+            }
+
+            ViewData["Mensaje"] = mensaje;
+
+            if (registrado)
             {
-                return RedirectToAction("Login","Acceso");
+                return RedirectToAction("Login", "Acceso");
             }
             else
             {
-
                 return View();
             }
 
-            
         }
-
 
         [HttpPost]
         public ActionResult Login(Usuario oUsuario)
@@ -81,34 +80,32 @@ namespace PRUEBAS_LOGIN.Controllers
 
             using (SqlConnection cn = new SqlConnection(cadena))
             {
+
                 SqlCommand cmd = new SqlCommand("sp_ValidarUsuario", cn);
                 cmd.Parameters.AddWithValue("Correo", oUsuario.Correo);
                 cmd.Parameters.AddWithValue("Clave", oUsuario.Clave);
-              
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cn.Open();
-                 oUsuario.idUsuario = Convert.ToInt32 (cmd.ExecuteScalar().ToString());
+
+                oUsuario.idUsuario = Convert.ToInt32(cmd.ExecuteScalar().ToString());
                 
             }
-             if(oUsuario.idUsuario != 0)
+
+            if (oUsuario.idUsuario != 0)
             {
-                Session["Usuario"] = oUsuario;
-                return RedirectToAction("Index","Home");
+
+                Session["usuario"] = oUsuario;
+                return RedirectToAction("Index", "Home");
             }
             else
             {
-                ViewData["Mensaje"] ="Usuario no encontrado";
+                ViewData["Mensaje"] = "usuario no encontrado";
                 return View();
             }
 
 
-            
         }
-
-
-
-
 
 
 
@@ -129,6 +126,8 @@ namespace PRUEBAS_LOGIN.Controllers
 
             return Sb.ToString();
         }
+
+
 
     }
 }
